@@ -20,13 +20,16 @@ router.get("/sites/user/:id", async function (req, res) {
     return res.json({ status: "Please Login" });
   }
     try{
-      let sql='Select * from passwordtable where userid=7';
-      const check=await query(sql);
+        var data={
+            userid:userid
+        }
+      let sql='Select * from passwordtable where userid=?';
+      const check=await query(sql,data);
       for(let i=0;i<check.length;i+=1){
           check[i].password=decrypt(check[i].password); 
           console.log(check[i].password);
       }
-      console.log(check);
+      
       return res.json(check);
     }
     catch(error){
