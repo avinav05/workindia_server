@@ -15,7 +15,7 @@ router.post("/sites/:id", async function (req, res) {
   var website = req.body.website;
   var username=req.body.username;
   var password=cipher.update(req.body.password, 'utf8', 'hex') + cipher.final('hex');
-  console.log(typeof(password));
+  //console.log(typeof(password));
   if(req.session.userid!==userid){
     return res.json({ status: "Please Login" });
     

@@ -18,9 +18,7 @@ router.post("/user/auth", async function (req, res) {
   const id=user[0].userid;
   const match = await bcrypt.compare(pass, check);
   if (match) {
-    console.log(id);
     req.session.userid=id;
-    console.log(req.session);
     res.send(JSON.stringify({"status": "success","response":id}));
   }
   else
