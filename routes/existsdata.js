@@ -6,9 +6,13 @@ const util = require('util');
 var crypto = require('crypto');
 const cookieSession = require('cookie-session');
 const query = util.promisify(conn.query).bind(conn);
-var algorithm = 'aes256'; // or any other algorithm supported by OpenSSL
-var key = 'workindia';
-var decipher = crypto.createDecipher(algorithm, key);
+var secrateKey="secrateKey";
+function decrypt(encrypted) {
+    decryptalgo = crypto.createDecipher('aes192', secrateKey);
+    let decrypted = decryptalgo.update(encrypted, 'hex', 'utf8');
+    decrypted += decryptalgo.final('utf8');
+    return decrypted;
+}
 //var decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8'); 
 router.get("/sites/user/:id", async function (req, res) {
   var userid=req.params.id;
@@ -19,8 +23,10 @@ router.get("/sites/user/:id", async function (req, res) {
       let sql='Select * from passwordtable where userid=7';
       const check=await query(sql);
       for(let i=0;i<check.length;i+=1){
-          check[i].password=decipher.update(check[i].password, 'hex', 'utf8') + decipher.final('utf8'); 
+          check[i].password=decrypt(check[i].password); 
+          console.log(check[i].password);
       }
+      console.log(check);
       return res.json(check);
     }
     catch(error){
