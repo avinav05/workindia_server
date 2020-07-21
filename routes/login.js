@@ -1,13 +1,30 @@
 var router = require("express").Router();
-const User = require("../models/userdata");
-router.get("/login", async function (req, res) {
-  const user = await User.findOne({
-    email: req.body.email.toLowerCase(),
-  }).exec();
-  if (!user) {
-    return res.json({ msg: "Invalid email address" });
+const conn=require('../dbconnect');
+const mysql=require('mysql');
+const bcrypt = require('bcryptjs');
+const util = require('util');
+const cookieSession = require('cookie-session');
+const query = util.promisify(conn.query).bind(conn);
+router.post("/user/auth", async function (req, res) {
+  var username=req.body.username;
+  var pass=req.body.password;
+  let sql='select userid,password from register where username='+mysql.escape(username);
+  const user = await query(sql);
+  if (user.length==0) {
+    res.send(JSON.stringify({"status": "Invalid Username"}));
   }
-  if (user.password == req.body.password) return res.json(user);
-  else return res.json({ msg: "Invalid Password" });
+  else{
+    const check=user[0].password;
+  const id=user[0].userid;
+  const match = await bcrypt.compare(pass, check);
+  if (match) {
+    console.log(id);
+    req.session.userid=id;
+    console.log(req.session);
+    res.send(JSON.stringify({"status": "success","response":id}));
+  }
+  else
+  res.send(JSON.stringify({"status": "Invalid Password"}));
+  }
 });
 module.exports = router;
